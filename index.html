@@ -71,6 +71,25 @@ button:hover{background:#5a2fa8}
 #vmWrap{display:inline-block;margin-top:14px;padding:10px 18px;border:2px solid #b48cff;border-radius:10px;background:#2a1850;font-size:18px;cursor:pointer}
 #vmWrap input{transform:scale(1.4);margin-right:10px;vertical-align:middle;cursor:pointer}
 #vmWrap small{color:#cfc6e6}
+#mobWrap{display:inline-block;margin:14px 0 0 8px;padding:10px 18px;border:2px solid #6fd3ff;border-radius:10px;background:#122a48;font-size:18px;cursor:pointer}
+#mobWrap input{transform:scale(1.4);margin-right:10px;vertical-align:middle;cursor:pointer}
+#mobWrap small{color:#bcd8ea}
+.ov{justify-content:flex-start;overflow-y:auto}
+.ov::before,.ov::after{content:"";flex:0 0 0;margin:auto}
+html,body{touch-action:none}
+#touch{display:none;position:fixed;inset:0;z-index:6;pointer-events:none}
+#touch .tbtn{position:fixed;pointer-events:auto;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(40,20,80,.55);border:2px solid #fff6;color:#fff;font-size:24px;-webkit-user-select:none;user-select:none;touch-action:none}
+#touch .tbtn.on{border-color:#ffd54a;background:rgba(120,70,200,.8);box-shadow:0 0 14px #ffd54a}
+#touch .tsp{right:calc(10px + env(safe-area-inset-right));width:min(11vh,54px);height:min(11vh,54px);top:calc(58px + var(--i) * (min(11vh,54px) + 6px))}
+#tFire{right:calc(26px + min(11vh,54px) + env(safe-area-inset-right));bottom:24px;width:min(21vh,92px);height:min(21vh,92px);font-size:38px;background:rgba(160,60,200,.6)}
+#tCancel{right:calc(26px + min(11vh,54px) + env(safe-area-inset-right));bottom:calc(24px + min(21vh,92px) + 12px);width:44px;height:44px;font-size:20px}
+#tBook{top:10px;right:calc(10px + env(safe-area-inset-right));width:44px;height:44px;font-size:22px}
+#tPrev,#tNext{top:10px;width:48px;height:44px;border-radius:12px;display:none;font-size:20px}
+#tPrev{left:calc(50% - 56px)} #tNext{left:calc(50% + 8px)}
+#joyBase{position:fixed;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid #fff5;opacity:.45}
+#joyKnob{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.35);border:2px solid #fff8}
+body.mob #status{white-space:normal;width:56%;text-align:center;font-size:15px;bottom:12px}
+#updBtn{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:30;padding:8px 16px;font-size:16px;background:#ffd54a;color:#241040;border:0;border-radius:20px;box-shadow:0 0 12px #000}
 </style>
 </head>
 <body>
@@ -84,8 +103,9 @@ button:hover{background:#5a2fa8}
      <b>우클릭</b>: 마법서 (Q/E로 장 넘기기) · <b>R</b>: 다시 그리기 · <b>C</b>: 취소</span></p>
   <p>주문: <b>화염</b>(범위 폭발) · <b>빙</b>(스턴) · <b>번개</b>(체인 공격) · <b>방어</b>(방어막) · <b>투명</b>(투명화)<br>
      적 마법사: <span style="color:#ff5a4a">빨강=화염</span> · <span style="color:#ffe84a">노랑=번개</span> · <span style="color:#7fd8ff">하늘=빙(스턴)</span> · <span style="color:#6a82ff">남색=방(탱커)</span> · <span style="color:#c58bff">보라=투(내 뒤에서 근접)</span><br>박수가 잘 안 잡히면 화면 오른쪽 아래 감도 슬라이더를 조절하세요.</p>
-  <p id="keyHelp" style="display:none"><b>🔑 키 모드</b> (마이크 사용 안 함)<br><b>Z</b> 화염 · <b>X</b> 빙 · <b>C</b> 번개 · <b>V</b> 방어 · <b>B</b> 투명 → <b>즉시 장전</b><br><b>좌클릭</b> 발사 · 같은 키를 다시 누르면 장전 취소 · <b>우클릭</b> 마법서</p>
-  <label id="vmWrap"><input type="checkbox" id="voiceChk" checked>🎤 목소리 모드 <small>(끄면 Z·X·C·V·B 키로 바로 장전)</small></label><br>
+  <p id="keyHelp" style="display:none"><b>🔑 키 모드</b> (마이크 사용 안 함)<br><b>Z</b> 화염 · <b>X</b> 빙 · <b>C</b> 번개 · <b>V</b> 방어 · <b>B</b> 투명 → 주문 <b>음성은 건너뛰고</b> 바로 <b>마법진 그리기</b><br>마우스를 움직여 마법진을 따라 그리면 장전 → <b>좌클릭</b> 발사 · 같은 키를 다시 누르면 취소 · <b>우클릭</b> 마법서</p>
+  <p id="mobHelp" style="display:none"><b>📱 모바일 모드</b><br>왼쪽 화면 드래그 = 이동 · 오른쪽 화면 드래그 = 시점 이동<br>오른쪽 마법 버튼(🔥❄⚡🛡👻)을 누르면 마법진 그리기 시작 → 손가락으로 따라 그리면 장전 → 🪄 버튼으로 발사</p>
+  <label id="vmWrap"><input type="checkbox" id="voiceChk" checked>🎤 목소리 모드 <small>(끄면 키로 마법 선택)</small></label><label id="mobWrap"><input type="checkbox" id="mobChk">📱 모바일 모드 <small>(터치 조작)</small></label><br>
   <button id="startBtn">게임 시작</button>
   <button id="installBtn" style="display:none">📲 앱으로 설치</button>
   <div id="deny"></div>
@@ -120,6 +140,12 @@ button:hover{background:#5a2fa8}
 </div>
 
 <!-- Three.js (크롬에서 인터넷 연결 필요) -->
+<div id="touch">
+  <div id="joyBase"><div id="joyKnob"></div></div>
+  <div class="tbtn" id="tFire">🪄</div><div class="tbtn" id="tCancel">✖</div><div class="tbtn" id="tBook">📖</div>
+  <div class="tbtn" id="tPrev">◀</div><div class="tbtn" id="tNext">▶</div>
+</div>
+<button id="updBtn" style="display:none" onclick="location.reload()">🔄 새 버전이 있어요 — 눌러서 적용</button>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* =========================================================
@@ -158,8 +184,9 @@ let enemies = [], projs = [], fx = [];
 let bp = null, holding = false, wandResetAt = 0, bookOpen = false, bookPage = 0, bookDir = 1;   // bp = 지금 그리고 있는 마법진
 let audioCtx = null, analyser = null, micStream = null, micBuf = null, micLevel = 0, micAvg = 0, micPrev = 0, lastClap = 0;
 let shieldHits = 0, invisUntil = 0, bobT = 0;
-let voiceMode = true, pStun = 0, listenUntil = 0, listening = false, aimTarget = null, aimT = 0, cracks = [], crackFade = 0;
+let voiceMode = true, mobileMode = false, virtHold = false, pStun = 0, listenUntil = 0, listening = false, aimTarget = null, aimT = 0, cracks = [], crackFade = 0;
 const KEYSPELL = {KeyZ: 'fire', KeyX: 'ice', KeyC: 'bolt', KeyV: 'shield', KeyB: 'invis'}, KEYLABEL = {fire: 'Z', ice: 'X', bolt: 'C', shield: 'V', invis: 'B'};
+const IS_TOUCH = matchMedia('(pointer: coarse)').matches, mob = {x: 0, y: 0, run: false}, tspEls = [];
 const ck = document.getElementById('crk'), ckc = ck.getContext('2d');
 const keys = {};
 const player = {x: 0, z: 0, yaw: 0, pitch: 0};
@@ -171,13 +198,14 @@ const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(innerWidth, innerHeight);
 document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x121a3a);          // 밤하늘
-scene.fog = new THREE.Fog(0x121a3a, 25, 110);
+scene.background = new THREE.Color(0x1a2750);          // 밤하늘
+scene.fog = new THREE.Fog(0x1a2750, 40, 170);
 const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 700);
 camera.rotation.order = 'YXZ';
 scene.add(camera);
-scene.add(new THREE.AmbientLight(0x8a96c8, 0.8));
-const moonL = new THREE.DirectionalLight(0x9fb4ff, 0.55); moonL.position.set(-1, 2, 0.6); scene.add(moonL);  // 달빛
+scene.add(new THREE.AmbientLight(0x9aa6d8, 1.0));
+scene.add(new THREE.HemisphereLight(0xaec4ff, 0x2a3555, 0.55));   // 하늘빛이 위에서 부드럽게 비침
+const moonL = new THREE.DirectionalLight(0xbcd0ff, 1.0); moonL.position.set(0.6, 1.4, -0.5);   // 밝은 달빛 (달이 있는 방향에서) scene.add(moonL);  // 달빛
 const headLight = new THREE.PointLight(0xffd9a0, 1.0, 20);   // 플레이어 주변을 밝히는 불빛
 camera.add(headLight);
 addEventListener('resize', () => {
@@ -327,9 +355,31 @@ function facade(glow) {
     const l = new THREE.PointLight(0x9a4bff, 0.9, 40); l.position.set(i * T, 5, j * T); scene.add(l);
   });
 
+  // --- 도로 가로등 (교차로 모서리) + 바닥에 번지는 따뜻한 불빛 ---
+  const lampPole = new THREE.CylinderGeometry(0.1, 0.13, 5.2, 8), lampHead = new THREE.SphereGeometry(0.42, 10, 10);
+  const lampPM = new THREE.MeshLambertMaterial({color: 0x2b2b33}), lampBM = new THREE.MeshBasicMaterial({color: 0xffe2a0});
+  const pc = document.createElement('canvas'); pc.width = pc.height = 128; const pg = pc.getContext('2d'), pr = pg.createRadialGradient(64, 64, 0, 64, 64, 64);
+  pr.addColorStop(0, 'rgba(255,214,140,.55)'); pr.addColorStop(.5, 'rgba(255,200,120,.22)'); pr.addColorStop(1, 'rgba(255,190,110,0)'); pg.fillStyle = pr; pg.fillRect(0, 0, 128, 128);
+  const poolM = new THREE.MeshBasicMaterial({map: new THREE.CanvasTexture(pc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false}), poolG = new THREE.PlaneGeometry(18, 18);
+  const edgeT = [10.15, 12.85, 20.15, 22.85, 30.15, 32.85];
+  edgeT.forEach(ei => edgeT.forEach(ej => {
+    const x = ei * T, z = ej * T;
+    const pole = new THREE.Mesh(lampPole, lampPM); pole.position.set(x, 2.6, z);
+    const head = new THREE.Mesh(lampHead, lampBM); head.position.set(x, 5.3, z);
+    const pool = new THREE.Mesh(poolG, poolM); pool.rotation.x = -Math.PI / 2; pool.position.set(x, 0.07, z);
+    scene.add(pole, head, pool); obst.push({x, z, r: 0.3});
+  }));
+  if (!IS_TOUCH) [11.5, 21.5, 31.5].forEach(i => [11.5, 21.5, 31.5].forEach(j => {   // PC에서는 교차로마다 실제 조명도 켬 (폰은 성능을 위해 생략)
+    const l = new THREE.PointLight(0xffd9a0, 0.8, 30); l.position.set(i * T, 5.5, j * T); scene.add(l);
+  }));
+
   // --- 달과 별 ---
-  const moon = new THREE.Mesh(new THREE.SphereGeometry(14, 16, 16), new THREE.MeshBasicMaterial({color: 0xfff4d0, fog: false}));
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(18, 20, 20), new THREE.MeshBasicMaterial({color: 0xfff8e0, fog: false}));
   moon.position.set(L / 2 + 120, 150, -60); scene.add(moon);
+  const hc = document.createElement('canvas'); hc.width = hc.height = 128; const hg = hc.getContext('2d'), hr = hg.createRadialGradient(64, 64, 8, 64, 64, 64);
+  hr.addColorStop(0, 'rgba(255,250,220,.9)'); hr.addColorStop(.35, 'rgba(210,225,255,.35)'); hr.addColorStop(1, 'rgba(180,200,255,0)'); hg.fillStyle = hr; hg.fillRect(0, 0, 128, 128);
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({map: new THREE.CanvasTexture(hc), blending: THREE.AdditiveBlending, depthWrite: false, fog: false}));
+  halo.scale.set(130, 130, 1); halo.position.copy(moon.position); scene.add(halo);          // 달 주변의 은은한 빛무리
   const sp = []; for (let i = 0; i < 500; i++) { const a = Math.random() * 6.283, e = Math.random() * 1.3 + .1; sp.push(Math.cos(a) * Math.cos(e) * 400 + L / 2, Math.sin(e) * 400, Math.sin(a) * Math.cos(e) * 400 + L / 2); }
   const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
   scene.add(new THREE.Points(sg, new THREE.PointsMaterial({color: 0xffffff, size: 1.6, fog: false})));
@@ -719,20 +769,22 @@ function buildShape(k) {                           // pts: 따라 그릴 경로(
 }
 function bpText() {
   if (!bp) return '';
-  return bp.done ? '✅ ' + SPELLS[bp.k].name + (voiceMode ? ' 장전 완료!  시점을 돌려 조준하고 👏 박수로 발사' : ' 장전 완료!  조준하고 좌클릭으로 발사') : '✍ ' + SPELLS[bp.k].name + ' — 좌클릭을 누른 채 ● 시작점부터 번호 순서대로 따라 그리세요';
+  return bp.done ? '✅ ' + SPELLS[bp.k].name + (voiceMode ? ' 장전 완료!  시점을 돌려 조준하고 👏 박수로 발사' : mobileMode ? ' 장전 완료!  조준하고 🪄 버튼으로 발사' : ' 장전 완료!  조준하고 좌클릭으로 발사') : '✍ ' + SPELLS[bp.k].name + (voiceMode ? ' — 좌클릭을 누른 채 ● 시작점부터 번호 순서대로 따라 그리세요' : mobileMode ? ' — 손가락을 드래그해 ● 시작점부터 번호 순서대로 따라 그리세요' : ' — 마우스를 움직여 ● 시작점부터 번호 순서대로 따라 그리세요');
 }
-function keyLoad(k) {                              // 키 모드: 마법진 없이 바로 장전
+function keyLoad(k) {                              // 키/버튼: 음성 단계는 건너뛰고 바로 마법진 그리기로
   if (performance.now() / 1000 < pStun) { setStatus('🧊 얼어붙어서 마법을 쓸 수 없어요!', 1.2); return; }
-  if (bp && bp.k === k) { bp = null; resetWand(); setStatus('장전을 취소했어요', 1.2); return; }
-  bp = {k, pts: [], marks: [], idx: 0, done: true, cx: 0, cy: 0, trail: []};
-  setWand(SPELLS[k].color); wandResetAt = 0; setStatus(bpText());
+  if (bp && bp.k === k) { cancelCast(); return; }
+  startBlueprint(k); holding = true; virtHold = true; listening = false; listenUntil = 0;   // 마우스 버튼을 누르지 않아도 시점 고정 + 그리기
 }
+function cancelCast() { bp = null; holding = false; virtHold = false; resetWand(); setStatus('마법을 취소했어요', 1.2); }
 function keyFire() {
   if (performance.now() / 1000 < pStun) { setStatus('🧊 얼어붙어서 마법을 쓸 수 없어요!', 1.2); return; }
-  if (bp && bp.done) castSpell(bp.k); else setStatus('먼저 Z·X·C·V·B 키로 마법을 장전하세요', 1.5);
+  if (bp && bp.done) castSpell(bp.k);
+  else if (bp) setStatus('✍ 마법진을 먼저 완성하세요 (' + Math.round(bp.idx / bp.pts.length * 100) + '%)', 1.2);
+  else setStatus(mobileMode ? '먼저 오른쪽 마법 버튼을 눌러 마법진을 그리세요' : '먼저 Z·X·C·V·B 키로 마법을 고르고 마법진을 그리세요', 1.8);
 }
 function releaseHold() {                           // 좌클릭을 놓았을 때: 그리던 중이면 취소, 장전됐으면 유지
-  if (!holding) return; holding = false; listening = false; listenUntil = 0;
+  if (!holding) return; holding = false; virtHold = false; listening = false; listenUntil = 0;
   if (bp && !bp.done) { bp = null; resetWand(); consumeAll(); setStatus('마법진을 다 그리기 전에 손을 떼서 취소됐어요 (끝까지 좌클릭 유지!)', 2.5); }
   else setStatus(bpText());
 }
@@ -749,7 +801,7 @@ function updateBlueprint(dt, now) {
   if (!bp) return;
   if (!bp.done) {
     advance(bp, DR * 0.18);
-    if (bp.idx >= bp.pts.length - 3) { bp.done = true; setStatus(bpText()); }
+    if (bp.idx >= bp.pts.length - 3) { bp.done = true; if (virtHold) { holding = false; virtHold = false; } setStatus(bpText()); }   // 완성되면 시점 고정 해제
   }
   const l = bp.trail[bp.trail.length - 1];         // 지팡이가 지나간 자국
   if (!l || Math.hypot(bp.cx - l.x, bp.cy - l.y) > 3) { bp.trail.push({x: bp.cx, y: bp.cy, t: now}); if (bp.trail.length > 400) bp.trail.shift(); }
@@ -846,14 +898,14 @@ function shapeSVG(k) {                             // 마법서에 들어가는 
     <li>✍ <b>계속 누른 채</b> 마우스로 ● 시작점부터 <b>번호 순서대로</b> 마법진을 따라 그리면 <b>장전</b>!</li>
     <li>👏 <b>박수</b>를 치면 <b>지금 보고 있는 방향</b>으로 발사!</li></ol>
     <div class="hint">다 그리기 전에 좌클릭을 놓으면 취소 · R: 처음부터 다시 · C: 취소/장전 해제</div>
-    <div>🔑 <b>목소리 모드를 끄면</b>: <b>Z</b> 화염 · <b>X</b> 빙 · <b>C</b> 번개 · <b>V</b> 방어 · <b>B</b> 투명 키로 <b>즉시 장전</b>, <b>좌클릭</b>으로 발사!</div>
+    <div>🔑 <b>목소리 모드를 끄면</b>: <b>Z</b> 화염 · <b>X</b> 빙 · <b>C</b> 번개 · <b>V</b> 방어 · <b>B</b> 투명 키로 음성 없이 바로 <b>마법진 그리기</b> → 장전 → <b>좌클릭</b> 발사! (📱 모바일 모드는 마법 버튼)</div>
     <div>🎤 박수가 안 잡히거나 너무 잘 잡히면 오른쪽 아래 <b>감도 슬라이더</b>를 조절하세요 ([ ] 키도 OK).</div>
     <div>▶ <b>E</b> 키로 다음 장: 화염 → 얼음 → 번개 → 방어 → 투명 → 적 도감</div>`);
   for (const k in SPELLS) {
     const S = SPELLS[k], I = SHAPE_INFO[k], c = hexs(S.color), n = buildShape(k).marks.length;
     PAGES.push(`<h2 style="color:${c};text-shadow:0 0 1px #000">${S.chant === S.name ? S.name : S.chant + ' · ' + S.name}</h2>${shapeSVG(k)}
       <div>🗣 <b>주문</b> "${S.chant}" <small>(${I.alt} 도 인식)</small></div>
-      <div>🔑 <b>키 모드</b> <b>${KEYLABEL[k]}</b> 키로 즉시 장전 → 좌클릭 발사</div>
+      <div>🔑 <b>키 모드</b> <b>${KEYLABEL[k]}</b> 키(📱 버튼)로 선택 → 마법진 그리기 → 좌클릭(🪄) 발사</div>
       <div>✍ <b>마법진</b> ${I.name}</div>
       <div><b>순서</b> ${CIRC.slice(0, n).join(' → ')} → ①</div>
       <div class="hint">${I.hint}</div>
@@ -912,7 +964,7 @@ addEventListener('mousemove', e => {
   player.pitch = Math.max(-1.3, Math.min(1.3, player.pitch - e.movementY * 0.0022));
 });
 addEventListener('mousedown', e => {
-  if (state !== 'play') return;
+  if (state !== 'play' || mobileMode) return;
   if (e.target.closest && e.target.closest('#mic')) return;       // 감도 슬라이더 조작은 그대로 통과
   if (!document.pointerLockElement) { renderer.domElement.requestPointerLock(); return; }
   if (e.button === 2) toggleBook();                               // 우클릭: 마법서 열기/닫기
@@ -924,7 +976,7 @@ addEventListener('mousedown', e => {
     setStatus('🪄 지팡이 ON! 3초 안에 주문을 외치세요 (화염·빙·번개·방어·투명)');
   }
 });
-addEventListener('mouseup', e => { if (e.button === 0) releaseHold(); });
+addEventListener('mouseup', e => { if (e.button === 0 && !virtHold && !mobileMode) releaseHold(); });
 
 /* =========================================================
    게임 시작 / 종료
@@ -949,24 +1001,39 @@ function showDeny() {
   const deny = $('deny'); deny.style.display = 'block';
   deny.innerHTML = '🎤 마이크 권한이 거부되었습니다.<br>목소리 모드는 음성 주문과 박수 인식이 필요해요. 주소창 왼쪽 아이콘에서 마이크를 "허용"으로 바꾼 뒤 다시 시도하거나, 목소리 모드를 끄고 Z·X·C·V·B 키로 플레이하세요.';
 }
-$('voiceChk').onchange = async () => {              // 목소리 모드 켜면 바로 마이크 허용을 물어봄 / 끄면 키 모드 안내
-  const on = $('voiceChk').checked;
-  $('voiceSteps').style.display = on ? '' : 'none'; $('keyHelp').style.display = on ? 'none' : 'block'; $('deny').style.display = 'none';
-  if (on && !(await setupMic())) showDeny();
+function syncModeUI() {                           // 메뉴 안내문을 선택한 모드에 맞게 표시
+  const v = $('voiceChk').checked, m = $('mobChk').checked;
+  $('voiceSteps').style.display = (v && !m) ? '' : 'none'; $('keyHelp').style.display = (!v && !m) ? 'block' : 'none'; $('mobHelp').style.display = m ? 'block' : 'none';
+}
+$('voiceChk').onchange = async () => {              // 목소리 모드를 켜면 바로 마이크 허용을 물어봄
+  if ($('voiceChk').checked) $('mobChk').checked = false;
+  $('deny').style.display = 'none'; syncModeUI();
+  if ($('voiceChk').checked && !(await setupMic())) showDeny();
 };
+$('mobChk').onchange = () => { if ($('mobChk').checked) $('voiceChk').checked = false; $('deny').style.display = 'none'; syncModeUI(); };
+if (IS_TOUCH) { $('mobChk').checked = true; $('voiceChk').checked = false; }     // 터치 기기는 모바일 모드가 기본
+syncModeUI();
+function enterPlay() {                              // PC: 포인터 락 / 모바일: 전체화면 + 가로 고정
+  if (mobileMode) {
+    try { const el = document.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el); } catch (e) {}
+    try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
+  } else renderer.domElement.requestPointerLock();
+}
 $('startBtn').onclick = async () => {
   $('deny').style.display = 'none';
-  voiceMode = $('voiceChk').checked;
+  mobileMode = $('mobChk').checked; voiceMode = !mobileMode && $('voiceChk').checked;
   if (voiceMode) {
     if (!(await setupMic())) { showDeny(); return; }
     if (!speechOn && !startSpeech()) { const deny = $('deny'); deny.style.display = 'block'; deny.textContent = '이 브라우저는 음성 인식을 지원하지 않습니다. 크롬을 사용하거나 목소리 모드를 끄고 키로 플레이하세요.'; return; }
-  } else stopVoice();                               // 키 모드: 마이크 사용 안 함
+  } else stopVoice();                               // 키/모바일 모드: 마이크 사용 안 함
+  document.body.classList.toggle('mob', mobileMode);
   $('mic').style.display = voiceMode ? 'block' : 'none'; $('heard').style.display = voiceMode ? '' : 'none';
   $('menu').style.display = 'none';
-  newGame(); renderer.domElement.requestPointerLock();
+  newGame(); enterPlay();
 };
 $('menuBtn').onclick = () => { $('end').style.display = 'none'; stopVoice(); $('menu').style.display = 'flex'; state = 'menu'; };
-$('restartBtn').onclick = () => { $('end').style.display = 'none'; newGame(); renderer.domElement.requestPointerLock(); };
+$('restartBtn').onclick = () => { $('end').style.display = 'none'; newGame(); enterPlay(); };
+
 
 function newGame() {
   enemies.forEach(e => scene.remove(e.g)); projs.forEach(p => scene.remove(p.m)); fx.forEach(f => scene.remove(f.m));
@@ -984,7 +1051,7 @@ function newGame() {
     enemies.push(makeEnemy((i + .5) * T, (j + .5) * T, false, types[k]));
   }
   state = 'play';
-  setStatus(voiceMode ? '좌클릭(지팡이 ON) → 3초 안에 주문 → 마법진 그리기 → 장전 → 👏 박수!  우클릭: 마법서' : 'Z 화염 · X 빙 · C 번개 · V 방어 · B 투명 → 장전, 좌클릭 발사!  우클릭: 마법서', 7);
+  setStatus(voiceMode ? '좌클릭(지팡이 ON) → 3초 안에 주문 → 마법진 그리기 → 장전 → 👏 박수!  우클릭: 마법서' : mobileMode ? '마법 버튼 → 마법진 그리기 → 🪄 발사!  왼쪽 드래그: 이동 · 오른쪽 드래그: 시점' : 'Z 화염 · X 빙 · C 번개 · V 방어 · B 투명 → 마법진 그리기 → 좌클릭 발사!  우클릭: 마법서', 7);
 }
 function endGame(win) {
   state = 'end'; bp = null; holding = false; document.exitPointerLock();
@@ -999,8 +1066,8 @@ function endGame(win) {
 const clock = new THREE.Clock();
 function update(dt, now) {
   // --- 플레이어 이동 (WASD) ---
-  const f = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0), r = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0), l = Math.hypot(f, r) || 1;
-  const stunned = now < pStun, sp = stunned ? 0 : (keys.ShiftLeft ? 8 : 5) * dt, y = player.yaw;
+  const f = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0) - mob.y, r = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0) + mob.x, l = Math.max(1, Math.hypot(f, r));
+  const stunned = now < pStun, sp = stunned ? 0 : (keys.ShiftLeft || mob.run ? 8 : 5) * dt, y = player.yaw;
   moveEnt(player, (-Math.sin(y) * f + Math.cos(y) * r) / l * sp, (-Math.cos(y) * f - Math.sin(y) * r) / l * sp, 0.5);
   if (f || r) bobT += dt * 10;
   camera.position.set(player.x, 1.7 + Math.sin(bobT) * 0.05, player.z);
@@ -1129,7 +1196,12 @@ function update(dt, now) {
 function loop() {
   requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta(), 0.05), now = performance.now() / 1000;
-  const locked = !!document.pointerLockElement;
+  const locked = mobileMode || !!document.pointerLockElement;
+  if (mobileMode) {                                 // 터치 UI 표시/갱신
+    const on = state === 'play'; $('touch').style.display = on ? 'block' : 'none';
+    if (!on) { mob.x = mob.y = 0; mob.run = false; }
+    else { tspEls.forEach(b => b.classList.toggle('on', !!bp && bp.k === b.dataset.k)); const bd = bookOpen ? 'flex' : 'none'; $('tPrev').style.display = bd; $('tNext').style.display = bd; }
+  } else $('touch').style.display = 'none';
   if (holding && !locked) releaseHold();            // 포인터 락이 풀리면 좌클릭도 놓은 것으로 처리
   $('pause').style.display = (state === 'play' && !locked) ? 'flex' : 'none';   // 포인터 락이 풀리면 안내
   if (state === 'play' && locked) update(dt, now);   // 마법서를 펼치면 게임 일시정지
@@ -1137,16 +1209,83 @@ function loop() {
   drawOverlay(now); drawCracks(now);                                  // 마법진 그리기 화면
   renderer.render(scene, camera);
 }
+/* =========================================================
+   모바일 터치 조작: 왼쪽 드래그=이동(조이스틱) · 오른쪽 드래그=시점/마법진 그리기 · 버튼=마법 선택/발사
+   ========================================================= */
+(function touchUI() {
+  const base = $('joyBase'), knob = $('joyKnob'), touch = $('touch');
+  let joyId = null, joyO = null, lookId = null, lx = 0, ly = 0;
+  const idle = () => { base.style.left = '36px'; base.style.top = (innerHeight - 156) + 'px'; base.style.opacity = .45; knob.style.transform = 'translate(0,0)'; };
+  idle(); addEventListener('resize', () => { if (joyId === null) idle(); });
+  const btn = (el, fn) => el.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); if (state === 'play') fn(); }, {passive: false});
+  [['fire', '🔥', '화염'], ['ice', '❄', '빙'], ['bolt', '⚡', '번개'], ['shield', '🛡', '방어'], ['invis', '👻', '투명']].forEach(([k, em, nm], i) => {
+    const b = document.createElement('div'); b.className = 'tbtn tsp'; b.dataset.k = k; b.style.setProperty('--i', i);
+    b.innerHTML = '<div style="text-align:center;line-height:1.05">' + em + '<br><small style="font-size:10px">' + nm + '</small></div>';
+    touch.appendChild(b); tspEls.push(b); btn(b, () => keyLoad(k));
+  });
+  btn($('tFire'), keyFire); btn($('tCancel'), () => { if (bp) cancelCast(); });
+  btn($('tBook'), toggleBook); btn($('tPrev'), () => flipBook(-1)); btn($('tNext'), () => flipBook(1));
+  document.addEventListener('touchstart', e => {
+    if (!mobileMode || state !== 'play') return;
+    for (const t of e.changedTouches) {
+      if (t.target.closest && t.target.closest('.tbtn')) continue;
+      if (t.clientX < innerWidth * 0.42 && joyId === null) {       // 왼쪽 절반: 이동 조이스틱 (손가락 위치에 생김)
+        joyId = t.identifier; joyO = {x: t.clientX, y: t.clientY};
+        base.style.left = (t.clientX - 60) + 'px'; base.style.top = (t.clientY - 60) + 'px'; base.style.opacity = 1;
+      } else if (lookId === null) { lookId = t.identifier; lx = t.clientX; ly = t.clientY; }   // 그 외: 시점 이동 / 마법진 그리기
+    }
+    e.preventDefault();
+  }, {passive: false});
+  document.addEventListener('touchmove', e => {
+    if (!mobileMode || state !== 'play') return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === joyId) {
+        let dx = t.clientX - joyO.x, dy = t.clientY - joyO.y; const m = Math.hypot(dx, dy), R = 55;
+        mob.run = m > R * 1.25; if (m > R) { dx *= R / m; dy *= R / m; }
+        knob.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        const s = Math.min(1, Math.hypot(dx, dy) / R); mob.x = s < .15 ? 0 : dx / R; mob.y = s < .15 ? 0 : dy / R;
+      } else if (t.identifier === lookId) {
+        const dx = t.clientX - lx, dy = t.clientY - ly; lx = t.clientX; ly = t.clientY;
+        if (holding) {
+          if (bp && !bp.done) {                                     // 마법진 그리는 중: 손가락이 지팡이 끝(커서)을 움직임
+            bp.cx += dx * 1.1; bp.cy += dy * 1.1;
+            const mm = Math.hypot(bp.cx, bp.cy), lim = DR * 1.3; if (mm > lim) { bp.cx *= lim / mm; bp.cy *= lim / mm; }
+          }
+        } else { player.yaw -= dx * 0.0055; player.pitch = Math.max(-1.3, Math.min(1.3, player.pitch - dy * 0.0055)); }   // 화면 드래그로 시점 이동
+      }
+    }
+    e.preventDefault();
+  }, {passive: false});
+  const end = e => { for (const t of e.changedTouches) {
+    if (t.identifier === joyId) { joyId = null; mob.x = mob.y = 0; mob.run = false; idle(); }
+    if (t.identifier === lookId) lookId = null;
+  } };
+  document.addEventListener('touchend', end); document.addEventListener('touchcancel', end);
+})();
+
 camera.position.set(1.5 * T, 1.7, 1.5 * T);
 loop();
 </script>
 <script>
-// ===== PWA: 서비스워커 등록 / 설치 버튼 =====
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
-let _installEv = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); _installEv = e; document.getElementById('installBtn').style.display = 'inline-block'; });
-document.getElementById('installBtn').onclick = async () => { if (!_installEv) return; _installEv.prompt(); await _installEv.userChoice; _installEv = null; document.getElementById('installBtn').style.display = 'none'; };
-window.addEventListener('appinstalled', () => { document.getElementById('installBtn').style.display = 'none'; });
+// ===== PWA: 서비스워커 / 자동 업데이트 / 설치 버튼 =====
+(function () {
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', {updateViaCache: 'none'}).then(r => setInterval(() => r.update().catch(() => {}), 60000)).catch(() => {}));
+  // 새 버전 감지: 저장소에 파일을 다시 올리면 index.html 내용이 달라짐 → 메뉴/종료 화면이면 자동 새로고침, 게임 중이면 버튼으로 알림
+  const sig = t => { let h = 0; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; return h + ':' + t.length; };
+  let baseSig = null;
+  async function check() {
+    try {
+      const t = await (await fetch('./index.html?v=' + Date.now(), {cache: 'no-store'})).text(), s = sig(t);
+      if (baseSig === null) { baseSig = s; return; }
+      if (s !== baseSig) { if (typeof state !== 'undefined' && state === 'play') document.getElementById('updBtn').style.display = 'block'; else location.reload(); }
+    } catch (e) {}
+  }
+  check(); setInterval(check, 60000); window.addEventListener('focus', check);
+  let ev = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); ev = e; document.getElementById('installBtn').style.display = 'inline-block'; });
+  document.getElementById('installBtn').onclick = async () => { if (!ev) return; ev.prompt(); await ev.userChoice; ev = null; document.getElementById('installBtn').style.display = 'none'; };
+  window.addEventListener('appinstalled', () => { document.getElementById('installBtn').style.display = 'none'; });
+})();
 </script>
 </body>
 </html>
