@@ -34,7 +34,7 @@ button:hover{background:#5a2fa8}
 #bossbar i{background:linear-gradient(90deg,#82f,#d6f)}
 #cross{top:50%;left:50%;width:8px;height:8px;margin:-4px;border:1px solid #fffa;border-radius:50%}
 #status{bottom:60px;left:50%;transform:translateX(-50%);font-size:20px;text-shadow:0 0 6px #000;white-space:nowrap}
-#heard{bottom:14px;left:14px;font-size:12px;color:#bbb;text-shadow:0 0 3px #000}
+#heard{bottom:14px;left:50%;transform:translateX(-50%);max-width:58vw;font-size:17px;color:#fff;background:#000b;padding:6px 14px;border-radius:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 3px #000}
 #warn{display:none;top:50px;left:50%;transform:translateX(-50%);background:#7a1c1c;padding:8px 14px;border-radius:8px;font-size:14px}
 #draw{position:fixed;inset:0;z-index:4;pointer-events:none}
 #hud>#mic{right:14px;bottom:14px;width:210px;z-index:12;pointer-events:auto;background:#000b;border:1px solid #fff4;border-radius:8px;padding:8px 10px;font-size:12px}
@@ -127,7 +127,7 @@ body.mob #status{white-space:normal;width:56%;text-align:center;font-size:15px;b
   <div id="bossbar">대마법사 모르투스<span class="bar"><i id="bhp"></i></span></div>
   <div id="cross"></div>
   <div id="status"></div>
-  <div id="heard">인식: </div>
+  <div id="heard">🎙 마이크 준비 중...</div>
   <div id="warn"></div>
   <div id="listen"><span id="lt"></span><div class="lb"><i id="li"></i></div></div>
   <div id="invisHud">👻 투명 <b id="invT"></b><div class="lb" style="min-width:0"><i id="invI" style="background:#c58bff"></i></div></div>
@@ -155,7 +155,7 @@ body.mob #status{white-space:normal;width:56%;text-align:center;font-size:15px;b
 const _dc = {}, $ = id => _dc[id] || (_dc[id] = document.getElementById(id));
 const sset = (id, k, v) => { const el = $(id), p = '_' + k; if (el[p] !== v) { el[p] = v; el.style[k] = v; } };   // 값이 바뀔 때만 DOM에 씀 (매 프레임 쓰기 방지)
 const tset = (id, v) => { const el = $(id); if (el._t !== v) { el._t = v; el.textContent = v; } };
-let micHot = false, pInv = 0, atkGate = 0;
+let lastHeard = '', micHot = false, pInv = 0, atkGate = 0;
 const N = 43, T = 5, H = 5;   // 캠퍼스 타일 수, 타일 한 칸 크기, 외벽 높이
 
 // ----- 주문 정의 (한 글자 주문! keys: 음성 인식 결과에 "포함"되면 인식, 공백 제거 후 includes 비교) -----
@@ -584,7 +584,7 @@ function failCast() {                              // 3초 안에 주문이 인�
     m.position.copy(p).add(new THREE.Vector3(rv() * .08, rv() * .08, rv() * .08)); scene.add(m);
     fx.push({m, life: lf, ml: lf, kind: 'smoke', mt: true, v: new THREE.Vector3(rv() * .35, .5 + Math.random() * .7, rv() * .35)});
   }
-  setStatus('❌ 실패! 주문이 인식되지 않았어요 (좌클릭을 다시 눌러 시도)', 2.4);
+  setStatus(lastHeard ? '❌ 실패! 들린 말: "' + lastHeard + '" — 주문(화염·빙·번개·방어·투명)을 또렷하게 한 단어로 말해보세요' : '❌ 실패! 아무 소리도 인식되지 않았어요 — 마이크 권한/선택된 마이크를 확인하세요 (좌클릭을 다시 눌러 시도)', 4);
 }
 
 /* =========================================================
@@ -800,7 +800,7 @@ function startSpeech() {
     const GL = window.SpeechGrammarList || window.webkitSpeechGrammarList;
     if (GL) { const gl = new GL(); gl.addFromString('#JSGF V1.0; grammar spell; public <spell> = 화염 | 하염 | 하연 | 화연 | 화 | 빙 | 핑 | 비 | 번개 | 번게 | 뻔개 | 번 | 방어 | 방오 | 방 | 투명 | 투멍 | 두명 | 투 ;', 1); rec.grammars = gl; }
   } catch (e) {}
-  rec.onstart = () => { recOn = true; $('heard').textContent = '🎙 듣는 중...'; };
+  rec.onstart = () => { recOn = true; $('heard').textContent = '🎙 듣는 중... 좌클릭을 누른 채 주문을 말해보세요'; $('heard').style.color = '#fff'; };
   rec.onresult = e => {
     const now = performance.now() / 1000, chanting = state === 'play' && holding && now < listenUntil + 0.6 && now >= ignoreSpeechUntil;   // 좌클릭 중 + 장전 전에만 인식 (박수 직후 1초는 무시)
     let shown = '', hit = null;
@@ -817,7 +817,11 @@ function startSpeech() {
         }
       }
     }
-    $('heard').textContent = '🎙 인식: ' + shown.trim().slice(-40);     // 지금 인식된 말을 작게 표시
+    lastHeard = shown.trim(); const lr = e.results[e.results.length - 1], alts = [];
+    for (let j = 0; j < Math.min(3, lr.length); j++) alts.push(lr[j].transcript.trim());
+    const hd = $('heard');   // 브라우저가 알아들은 말(후보 3개) + 주문 판정 결과
+    hd.textContent = '🎙 들은 말: "' + alts.join('" / "') + '"' + (chanting ? (hit ? '  → ✅ ' + SPELLS[hit].name + ' 인식!' : '  → ❌ 주문이 아니에요') : '  (좌클릭을 누른 채 말해야 주문으로 인식돼요)');
+    hd.style.color = chanting ? (hit ? '#7dff9a' : '#ffb3b3') : '#fff';
     if (hit) onHit(hit);
   };
   rec.onerror = e => {
@@ -1082,7 +1086,7 @@ addEventListener('mousedown', e => {
   else if (e.button === 0) { if (!voiceMode) { keyFire(); return; }                         // 좌클릭 누르기: 시점 고정 + 주문 외치기 시작 (장전된 마법이 있으면 버리고 새로 시작)
     const t0 = performance.now() / 1000;
     if (t0 < pStun) { setStatus('🧊 얼어붙어서 마법을 쓸 수 없어요!', 1.2); return; }
-    holding = true; bp = null; resetWand(); consumeAll();
+    holding = true; bp = null; resetWand(); consumeAll(); lastHeard = '';
     listening = true; listenUntil = t0 + 3;                        // 지팡이 ON → 3초 동안만 음성 감지
     setStatus('🪄 지팡이 ON! 3초 안에 주문을 외치세요 (화염·빙·번개·방어·투명)');
   }
